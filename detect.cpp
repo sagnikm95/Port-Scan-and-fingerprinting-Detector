@@ -181,12 +181,14 @@ void StatefullCheck(struct ip_hdr* ipptr , struct tcp_hdr* tcpptr,char* attacker
         //keep track of time of connection to be able to track time out and half connections
             attackers[attacker_index].tcp_conns[ attackers[attacker_index].tcp_conns_index].time_stamp = ((int)(time_stamp));
 
+//increment the number of SYN packets received on this connection
+	    attackers[attacker_index].tcp_conns[attackers[attacker_index].tcp_conns_index].number_of_syn++;
+
 	    //increment the number of connections for this IP and add one to the index
             attackers[attacker_index].tcp_conns_number++;
             attackers[attacker_index].tcp_conns_index = (attackers[attacker_index].tcp_conns_index +1) % MAX_CONNECTION_NUM;  	     
 		
-	    //increment the number of SYN packets received on this connection
-	    attackers[attacker_index].tcp_conns[attackers[attacker_index].tcp_conns_index].number_of_syn++;
+	    
         }
     }
 
@@ -200,15 +202,15 @@ void StatefullCheck(struct ip_hdr* ipptr , struct tcp_hdr* tcpptr,char* attacker
 		
         else if ((tcpptr->tcp_flags & 16) == 16){	//the packet is ACK
 
-            attackers[attacker_index].tcp_conns[attackers[attacker_index].tcp_conns_index].ack = true;
+            attackers[attacker_index].tcp_conns[tcp_conn_i].ack = true;
         }
         
         else if ((tcpptr->tcp_flags & 4) == 4){	//the packet is RST
 
-            attackers[attacker_index].tcp_conns[attackers[attacker_index].tcp_conns_index].rst = true;
+            attackers[attacker_index].tcp_conns[tcp_conn_i].rst = true;
 
-            if ((attackers[attacker_index].tcp_conns[attackers[attacker_index].tcp_conns_index].syn == true) &
-                (attackers[attacker_index].tcp_conns[attackers[attacker_index].tcp_conns_index].ack == false))
+            if ((attackers[attacker_index].tcp_conns[tcp_conn_i].syn == true) &
+                (attackers[attacker_index].tcp_conns[tcp_conn_i].ack == false))
             {  
              //keep count of pairs of SYN and RST TCP packets    
                 attackers[attacker_index].tcp_syn_and_rst_num++;
@@ -217,7 +219,7 @@ void StatefullCheck(struct ip_hdr* ipptr , struct tcp_hdr* tcpptr,char* attacker
         
         else if ((tcpptr->tcp_flags & 1) == 1){	//the packet is FIN
 
-            attackers[attacker_index].tcp_conns[attackers[attacker_index].tcp_conns_index].fin = true;
+            attackers[attacker_index].tcp_conns[tcp_conn_i].fin = true;
         }
     }	
 }
@@ -497,5 +499,4 @@ int find_attacker(struct in_addr attacker_ip){
 
     return -1; //attacker  not present in list
 }
-
 
