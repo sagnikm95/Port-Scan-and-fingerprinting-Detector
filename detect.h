@@ -27,8 +27,8 @@ void print_timestamp();
 
 struct handle_packet_params
 {
-    char packet[1500];
-    int length;
+    char packet[1500]; // packet captured using pcap as a sequence of bytes
+    int length; ///packet length
 };
 
 
@@ -36,18 +36,19 @@ struct handle_packet_params
 
 struct tcp_connection
 {
-    uint16_t src_port;
-    uint16_t dst_port;
-    bool syn;
+    uint16_t src_port;  // source port 
+    uint16_t dst_port;  // destination port
+    /*state variables : TCP flags true-> TCP packet has been send with flag set  */
+    bool syn;  
     bool ack;
     bool fin;
     bool rst;
 
-    int number_of_syn;
-    int time_stamp;
+    int number_of_syn; // no of syn packets sends -> no connection requests
+    int time_stamp;  // time of connection establishment
 
-    bool port_scan_detected;
-    bool half_opened_detected;
+    bool port_scan_detected; //state variable to show if port scan has been detected on dst_port
+    bool half_opened_detected; // state variable t denote half open TCP connection
 } __attribute__ ((packed)) ;
 
 struct udp_connection
@@ -58,11 +59,11 @@ struct udp_connection
 
 struct attacker
 {
-    struct in_addr attacker_ip;
+    struct in_addr attacker_ip; //attacker ip address
 
-    struct tcp_connection tcp_conns[MAX_CONNECTION_NUM];
-    int tcp_conns_number;
-    int tcp_conns_index;
+    struct tcp_connection tcp_conns[MAX_CONNECTION_NUM]; // array maintaing log of each tcp connection from this ip
+    int tcp_conns_number; // count of number of oconnections for this ip
+    int tcp_conns_index; // current empty location in the circular array tcp_conns
 
     struct udp_connection udp_conns[MAX_CONNECTION_NUM];
     int udp_conns_number;
